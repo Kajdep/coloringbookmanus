@@ -1,0 +1,197 @@
+/* Main Styles for Line Art Coloring Book Generator */
+
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --accent-color: #e74c3c;
+    --light-bg: #f8f9fa;
+    --dark-bg: #212529;
+    --light-text: #f8f9fa;
+    --dark-text: #212529;
+    --border-radius: 0.375rem;
+    --box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+}
+
+body {
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode {
+    background-color: var(--dark-bg);
+    color: var(--light-text);
+}
+
+.dark-mode .card {
+    background-color: #2d3339;
+    color: var(--light-text);
+}
+
+.dark-mode .card-header:not(.bg-primary) {
+    background-color: #343a40;
+    color: var(--light-text);
+}
+
+.dark-mode .form-control,
+.dark-mode .form-select {
+    background-color: #343a40;
+    color: var(--light-text);
+    border-color: #495057;
+}
+
+.dark-mode .text-muted {
+    color: #adb5bd !important;
+}
+
+.card {
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+}
+
+.card-header {
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+}
+
+.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Preview Area */
+#previewContainer {
+    position: relative;
+    width: 100%;
+    max-width: 768px;
+    margin: 0 auto;
+}
+
+.preview-placeholder {
+    width: 100%;
+    aspect-ratio: 1/1;
+    background-color: #e9ecef;
+    border-radius: var(--border-radius);
+}
+
+.dark-mode .preview-placeholder {
+    background-color: #343a40;
+}
+
+#previewImage {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+/* Gallery */
+.gallery-item {
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.2s ease;
+}
+
+.gallery-item:hover {
+    transform: scale(1.05);
+}
+
+.gallery-item.selected {
+    border: 3px solid var(--primary-color);
+}
+
+.gallery-item img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
+
+.gallery-placeholder {
+    width: 100%;
+    aspect-ratio: 1/1;
+    background-color: #e9ecef;
+    border-radius: var(--border-radius);
+}
+
+.dark-mode .gallery-placeholder {
+    background-color: #343a40;
+}
+
+/* Form Controls */
+.form-range::-webkit-slider-thumb {
+    background: var(--primary-color);
+}
+
+.form-range::-moz-range-thumb {
+    background: var(--primary-color);
+}
+
+.form-range::-ms-thumb {
+    background: var(--primary-color);
+}
+
+/* Progress Bar */
+.progress-bar {
+    background-color: var(--primary-color);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .row-cols-md-4 {
+        --bs-columns: 3;
+    }
+}
+
+@media (max-width: 576px) {
+    .row-cols-sm-3 {
+        --bs-columns: 2;
+    }
+    
+    #previewContainer {
+        max-width: 100%;
+    }
+}
+
+/* Animation for loading states */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.loading {
+    animation: pulse 1.5s infinite ease-in-out;
+}
