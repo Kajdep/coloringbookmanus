@@ -4,7 +4,7 @@ WSGI entry point for the Line Art Coloring Book Generator
 """
 
 import os
-from server import app
+from server_with_auth import app
 
 if __name__ == "__main__":
     # Get port from environment variable or default to 5000
