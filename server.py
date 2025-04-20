@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Line Art Coloring Book Generator - Backend Server
+Line Art Coloring Book Generator - Backend Server with Password Protection
 This server handles requests from the frontend and communicates with the Stable Diffusion API
 to generate line art images for coloring books.
 """
@@ -14,10 +14,11 @@ import requests
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 import zipfile
-from flask import Flask, request, jsonify, send_file, send_from_directory
+from flask import Flask, request, jsonify, send_file, send_from_directory, Response
 from flask_cors import CORS
 from dotenv import load_dotenv
 import logging
+from functools import wraps
 
 # Load environment variables
 load_dotenv()
@@ -52,6 +53,33 @@ os.makedirs(TEMP_FOLDER, exist_ok=True)
 # Configure app
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload size
+
+# Authentication Configuration
+# Get credentials from environment variables or use defaults
+AUTH_USERNAME = os.environ.get('AUTH_USERNAME', 'admin')
+AUTH_PASSWORD = os.environ.get('AUTH_PASSWORD', 'lineart2025')
+
+# Basic Authentication Implementation
+def check_auth(username, password):
+    """Check if the username and password are valid."""
+    return username == AUTH_USERNAME and password == AUTH_PASSWORD
+
+def authenticate():
+    """Send a 401 response that enables basic auth."""
+    return Response(
+        'Authentication required to access the Line Art Generator.\n'
+        'Please login with proper credentials', 401,
+        {'WWW-Authenticate': 'Basic realm="Login Required"'}
+    )
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
 
 # API Configuration
 # Get API key from environment variable
@@ -324,18 +352,21 @@ def create_zip_file(filepaths, zip_filename):
 
 # API Routes
 @app.route('/')
+@requires_auth
 def index():
-    """Serve the main HTML page"""
+    """Serve the main HTML page with authentication"""
     return send_file('index.html')
 
 @app.route('/<path:path>')
+@requires_auth
 def serve_static(path):
-    """Serve static files"""
+    """Serve static files with authentication"""
     return send_from_directory('.', path)
 
 @app.route('/api/generate-preview', methods=['POST'])
+@requires_auth
 def generate_preview():
-    """Generate a single preview image"""
+    """Generate a single preview image with authentication"""
     try:
         # Parse request data
         params = request.json
@@ -371,8 +402,9 @@ def generate_preview():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/generate-batch', methods=['POST'])
+@requires_auth
 def generate_batch():
-    """Generate a batch of images"""
+    """Generate a batch of images with authentication"""
     try:
         # Parse request data
         params = request.json
@@ -465,8 +497,9 @@ def generate_batch():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/download-zip', methods=['POST'])
+@requires_auth
 def download_zip():
-    """Create and download a ZIP file of images"""
+    """Create and download a ZIP file of images with authentication"""
     try:
         # Parse request data
         data = request.json
@@ -492,18 +525,21 @@ def download_zip():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/outputs/<filename>')
+@requires_auth
 def serve_output(filename):
-    """Serve generated images"""
+    """Serve generated images with authentication"""
     return send_from_directory(OUTPUT_FOLDER, filename)
 
 @app.route('/temp/<filename>')
+@requires_auth
 def serve_temp(filename):
-    """Serve temporary files (like ZIP files)"""
+    """Serve temporary files (like ZIP files) with authentication"""
     return send_from_directory(TEMP_FOLDER, filename)
 
 @app.route('/api/status', methods=['GET'])
+@requires_auth
 def api_status():
-    """Check API status"""
+    """Check API status with authentication"""
     try:
         # Check if API key is configured
         if not STABILITY_API_KEY:
